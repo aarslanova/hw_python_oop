@@ -49,7 +49,8 @@ class Training:
 
     def get_distance(self) -> float:
         '''
-        Расчитывает дистанцию, которую пользователь преодолел во время тренировки.
+        Расчитывает дистанцию, которую пользователь
+        преодолел во время тренировки.
         '''
         return self.action * self.LEN_STEP / self.M_IN_KM
 
@@ -109,7 +110,8 @@ class Running(Training):
 
 class SportsWalking(Training):
     '''
-    Создает объект SportsWalking для рассчета статистик по занятиям спортивным шагом.
+    Создает объект SportsWalking для рассчета
+    статистик по занятиям спортивным шагом.
     '''
     LEN_STEP: float = 0.65
     M_IN_KM: int = 1000
@@ -130,7 +132,6 @@ class SportsWalking(Training):
     def get_spent_calories(self) -> float:
         cof_kcal_1 = 0.035
         cof_kcal_2 = 0.029
-        wt_weight = cof_kcal_1 * self.weight
         hour_to_min: int = 60
 
         self.calories = ((cof_kcal_1 * self.weight
