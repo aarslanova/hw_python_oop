@@ -1,13 +1,11 @@
 class InfoMessage:
-    """
-    Создает объект класса сообщения.
-    """
+    """Создает объект класса сообщения."""
 
     def __init__(self,
                  training_type: str,
-                 duration: int,
+                 duration: float,
                  distance: float,
-                 speed: int,
+                 speed: float,
                  calories: int
                  ) -> None:
         self.training_type = training_type
@@ -17,9 +15,9 @@ class InfoMessage:
         self.calories = calories
 
     def get_message(self) -> str:
+        """Возвращает строку сообщения с детальной информацией о тренировке:
         """
-        Возвращает строку сообщения с детальной информацией о тренировке:
-        """
+
         return (f'Тип тренировки: {self.training_type}; '
                 f'Длительность: {self.duration:.3f} ч.; '
                 f'Дистанция: {self.distance:.3f} км; '
@@ -28,61 +26,58 @@ class InfoMessage:
 
 
 class Training:
-    '''
-    Создает базовый класс тренировки.
-    '''
+    """Создает базовый класс тренировки."""
+
     LEN_STEP: float = 0.65
     M_IN_KM: int = 1000
+    HOURS_TO_MINUTES: int = 60
 
     def __init__(self,
                  action: int,
                  duration: float,
                  weight: float
                  ) -> None:
-        self.training_type = None
+        self.training_type = self.__class__.__name__
         self.action = action
         self.duration = duration
         self.weight = weight
-        self.distance = self.get_distance()
-        self.speed = None
-        self.calories = None
 
     def get_distance(self) -> float:
-        '''
-        Расчитывает дистанцию, которую пользователь
+        """Расчитывает дистанцию, которую пользователь
         преодолел во время тренировки.
-        '''
+        """
+
         return self.action * self.LEN_STEP / self.M_IN_KM
 
     def get_mean_speed(self) -> float:
-        '''
-        Расчитывает среднюю скорость движения во время тренировки.
-        '''
-        return self.distance / self.duration
+        """Расчитывает среднюю скорость движения во время тренировки.
+        """
+
+        distance = self.get_distance()
+        return distance / self.duration
 
     def get_spent_calories(self) -> float:
-        '''
-        Расчитывает количество потраченных калорий во время тренировки.
-        '''
+        """Расчитывает количество потраченных калорий во время тренировки.
+        """
+
         pass
 
     def show_training_info(self) -> InfoMessage:
-        '''
-        Создает объект сообщения о результатах тренировки:
-        '''
+        """Создает объект сообщения о результатах тренировки:"""
+
         return InfoMessage(self.training_type,
                            self.duration,
-                           self.distance,
-                           self.speed,
-                           self.calories)
+                           self.get_distance(),
+                           self.get_mean_speed(),
+                           self.get_spent_calories())
 
 
 class Running(Training):
-    '''
-    Создает объект Running для рассчета статистик по занятиям бегом.
-    '''
-    LEN_STEP: float = 0.65
-    M_IN_KM: int = 1000
+    """Создает объект Running для рассчета статистик по занятиям бегом.
+    """
+
+    CALORIES_MEAN_SPEED_MULTIPLIER_1: int = 18
+    CALORIES_MEAN_SPEED_MULTIPLIER_2: int = 20
 
     def __init__(self,
                  action: int,
@@ -90,31 +85,29 @@ class Running(Training):
                  weight: float
                  ) -> None:
         super().__init__(action, duration, weight)
-        self.distance = super().get_distance()
-        self.speed = super().get_mean_speed()
-        self.calories = self.get_spent_calories()
-        self.training_type = 'Running'
 
     def get_spent_calories(self) -> float:
-        speed = super().get_mean_speed()
-        cof_kcal_1 = 18
-        cof_kcal_2 = 20
-        hour_to_min: int = 60
-        self.calories = ((cof_kcal_1 * speed - cof_kcal_2)
+        """Расчитывает количество потраченных калорий во время тренировки.
+        """
+
+        speed = self.get_mean_speed()
+        self.calories = ((self.CALORIES_MEAN_SPEED_MULTIPLIER_1
+                         * speed
+                         - self.CALORIES_MEAN_SPEED_MULTIPLIER_2)
                          * self.weight
                          / self.M_IN_KM
                          * self.duration
-                         * hour_to_min)
+                         * self.HOURS_TO_MINUTES)
         return self.calories
 
 
 class SportsWalking(Training):
-    '''
-    Создает объект SportsWalking для рассчета
+    """Создает объект SportsWalking для рассчета
     статистик по занятиям спортивным шагом.
-    '''
-    LEN_STEP: float = 0.65
-    M_IN_KM: int = 1000
+    """
+
+    WEIGHT_MULTIPLIER_1: float = 0.035
+    WEIGHT_MULTIPLIER_2: float = 0.029
 
     def __init__(self,
                  action: int,
@@ -124,30 +117,31 @@ class SportsWalking(Training):
                  ) -> None:
         super().__init__(action, duration, weight)
         self.height = height
-        self.distance = super().get_distance()
-        self.speed = super().get_mean_speed()
-        self.calories = self.get_spent_calories()
-        self.training_type = 'SportsWalking'
+        self.distance = self.get_distance()
+        self.speed = self.get_mean_speed()
 
     def get_spent_calories(self) -> float:
-        cof_kcal_1 = 0.035
-        cof_kcal_2 = 0.029
-        hour_to_min: int = 60
+        """Расчитывает количество потраченных калорий во время тренировки.
+        """
 
-        self.calories = ((cof_kcal_1 * self.weight
-                          + (self.speed**2 // self.height)
-                          * cof_kcal_2 * self.weight)
+        self.calories = ((self.WEIGHT_MULTIPLIER_1
+                          * self.weight
+                          + (self.speed**2
+                             // self.height)
+                          * self.WEIGHT_MULTIPLIER_2
+                          * self.weight)
                          * self.duration
-                         * hour_to_min)
+                         * self.HOURS_TO_MINUTES)
         return self.calories
 
 
 class Swimming(Training):
-    '''
-    Создает объект Swimming для рассчета статистик по занятиям плаваньем.
-    '''
+    """Создает объект Swimming для рассчета статистик по занятиям плаваньем.
+    """
+
     LEN_STEP: float = 1.38
-    M_IN_KM: int = 1000
+    CALORIES_MEAN_SPEED_CONSTANT: float = 1.1
+    CALORIES_MEAN_SPEED_MULTIPLIER: int = 2
 
     def __init__(self,
                  action: int,
@@ -159,12 +153,13 @@ class Swimming(Training):
         super().__init__(action, duration, weight)
         self.length_pool = length_pool
         self.count_pool = count_pool
-        self.distance = super().get_distance()
         self.speed = self.get_mean_speed()
         self.calories = self.get_spent_calories()
-        self.training_type = 'Swimming'
 
     def get_mean_speed(self) -> float:
+        """Расчитывает среднюю скорость движения во время тренировки.
+        """
+
         self.speed = (self.length_pool
                       * self.count_pool
                       / self.M_IN_KM
@@ -172,10 +167,12 @@ class Swimming(Training):
         return self.speed
 
     def get_spent_calories(self) -> float:
-        cof_kcal_1: float = 1.1
-        cof_kcal_2: int = 2
-        self.calories = ((self.speed + cof_kcal_1)
-                         * cof_kcal_2
+        """Расчитывает количество потраченных калорий во время тренировки.
+        """
+
+        self.calories = ((self.speed
+                         + self.CALORIES_MEAN_SPEED_CONSTANT)
+                         * self.CALORIES_MEAN_SPEED_MULTIPLIER
                          * self.weight)
         return self.calories
 
@@ -184,6 +181,7 @@ def read_package(workout_type: str,
                  data: list
                  ) -> Training:
     """Прочитать данные полученные от датчиков."""
+
     read_package = {'SWM': Swimming,
                     'RUN': Running,
                     'WLK': SportsWalking}
