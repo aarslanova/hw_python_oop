@@ -127,11 +127,11 @@ class SportsWalking(Training):
         self.calories = ((self.WEIGHT_MULTIPLIER_1
                           * self.weight
                           + (self.speed**2
-                             // self.height)
+                          // self.height)
                           * self.WEIGHT_MULTIPLIER_2
                           * self.weight)
-                         * self.duration
-                         * self.HOURS_TO_MINUTES)
+                          * self.duration
+                          * self.HOURS_TO_MINUTES)
         return self.calories
 
 
