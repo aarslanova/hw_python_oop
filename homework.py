@@ -126,8 +126,7 @@ class SportsWalking(Training):
 
         self.calories = ((self.WEIGHT_MULTIPLIER_1
                           * self.weight
-                          + (self.speed**2
-                             // self.height)
+                          + (self.speed**2 // self.height)
                           * self.WEIGHT_MULTIPLIER_2
                           * self.weight)
                          * self.duration
