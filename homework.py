@@ -86,10 +86,10 @@ class Running(Training):
         calories = ((self.CALORIES_MEAN_SPEED_MULTIPLIER_1
                      * speed
                      - self.CALORIES_MEAN_SPEED_MULTIPLIER_2)
-                     * self.weight
-                     / self.M_IN_KM
-                     * self.duration
-                     * self.HOURS_TO_MINUTES)
+                    * self.weight
+                    / self.M_IN_KM
+                    * self.duration
+                    * self.HOURS_TO_MINUTES)
         return calories
 
 
